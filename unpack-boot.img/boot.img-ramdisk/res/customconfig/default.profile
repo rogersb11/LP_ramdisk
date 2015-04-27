@@ -95,6 +95,7 @@ led_fade=on
 led_speed=1
 led_intensity=40
 force_disable=0
+timeout=3
 swap=off
 swappiness=0
 auto_oom=on

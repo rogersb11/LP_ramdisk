@@ -359,6 +359,15 @@ name="Mode" action="generic /sys/class/mdnie/mdnie/mode" unit="" min="0" reverse
 </settingsPane>
 <settingsPane description="Touchkeys Settings. Disable any touchkeys configurations your ROM might have to use these." name="Touch Keys">
 <checkbox description="Selecting this will force disable touchkeys no matter what settings are set below." name="Force Disable Touchkeys" action="generic01 /sys/devices/virtual/sec/sec_touchkey/force_disable" label="Force Disable Touchkeys"/>
+<spinner description="Led timeout settings." name="timeout" action="generic /sys/devices/virtual/sec/sec_touchkey/timeout">
+<spinnerItem name="No timeout" value="0"/>
+<spinnerItem name="1 sec" value="1"/>
+<spinnerItem name="3 sec" value="3"/>
+<spinnerItem name="6 sec" value="6"/>
+<spinnerItem name="15 sec" value="15"/>
+<spinnerItem name="30 sec" value="30"/>
+<spinnerItem name="60 sec" value="60"/>
+</spinner>
 </settingsPane>
 </settingsTab>
 <settingsTab name="Apps Random">
