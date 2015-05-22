@@ -285,6 +285,9 @@
 # For wpa_supp
 /dev/rfkill                             u:object_r:rfkill_device:s0
 
+# Netflix
+/data/data/com.netflix.mediaclient(/.*)?  u:object_r:app_data_file:s0
+
 # Firmwares
 /system/vendor/firmware(/.*)?           u:object_r:firmware_camera:s0
 /system/vendor/firmware/mfc_fw.bin      u:object_r:firmware_mfc:s0
