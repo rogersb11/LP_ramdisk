@@ -3,7 +3,7 @@
 
 DEFAULT_PROFILE=/res/customconfig/default.profile
 BATTERY_PROFILE=/res/customconfig/battery.profile
-PERFORMANCE_PROFILE=/res/customconfig/performance.profile
+SHIFTED_PROFILE=/res/customconfig/shifted.profile
 CONFIG_XML=/res/customconfig/customconfig.xml
 PROFILE_PATH=/data/.shift
 TEMP_CONFIG=$PROFILE_PATH/.config.tmp
@@ -54,7 +54,7 @@ select_profile()
     if [ ! -f ${PROFILE_PATH}/${_ACTIVE_PROFILE}.profile ];then
       cp $DEFAULT_PROFILE ${PROFILE_PATH}/${1}.profile
       [ "$_ACTIVE_PROFILE" == "battery" ] && cp $BATTERY_PROFILE ${PROFILE_PATH}/${1}.profile
-      [ "$_ACTIVE_PROFILE" == "performance" ] && cp $PERFORMANCE_PROFILE ${PROFILE_PATH}/${1}.profile
+      [ "$_ACTIVE_PROFILE" == "shifted" ] && cp $SHIFTED_PROFILE ${PROFILE_PATH}/${1}.profile
     fi
     if [ ! -f ${PROFILE_PATH}/${1}.profile ];then
       cp ${PROFILE_PATH}/${_ACTIVE_PROFILE}.profile ${PROFILE_PATH}/${1}.profile
@@ -126,7 +126,7 @@ read_defaults ()
   read_config "$DEFAULT_PROFILE"
   _ACTIVE_PROFILE=`cat $ACTIVE_PROFILE`
   [ "$_ACTIVE_PROFILE" == "battery" ] && read_config "$BATTERY_PROFILE"
-  [ "$_ACTIVE_PROFILE" == "performance" ] && read_config "$PERFORMANCE_PROFILE"
+  [ "$_ACTIVE_PROFILE" == "shifted" ] && read_config "$SHIFTED_PROFILE"
 }
 
 # some initialization code
