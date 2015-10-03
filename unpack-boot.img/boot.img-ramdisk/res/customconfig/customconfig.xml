@@ -372,6 +372,22 @@ name="Mode" action="generic /sys/class/mdnie/mdnie/mode" unit="" min="0" reverse
 </spinner>
 </settingsPane>
 </settingsTab>
+<settingsTab name="Cron Tab">
+<settingsPane description="Here you can activate some scripts which will automatically run in the background at a specified time." name="cron">
+<spinner description="Main switch for Cron Tasker. If you set this to OFF, then all tasks below have no effect!" name="CRON TASK MAIN SWITCH" action="crontab">
+<spinnerItem name="Cron ON" value="on"/> 
+<spinnerItem name="Cron OFF" value="off"/> 
+</spinner>
+<button description="Use this button to test if this Cron Task service is ONLINE and supported! If main switch is ON and service is OFFLINE, then ROM Busybox is not supporting Cron. Update Busybox or ROM for this to work." name="Test Cron Task Service" action="push-actions/crontab_test" label="Test Cron Task Service"/>
+<button description="Use this button to RESET the scripts and jobs from kernel, to refresh the configuration. This will clear all your custom changes!" name="CRON RESET" action="push-actions/crontab_reset" label="RESET CRON"/>
+<checkbox description="Cron to clear file-cache every hour, but only if CPU is resting (IDLE) and more than 50% of your memory is used! This will free RAM from unused buffers and cache." name="Clean file-cache" action="generic_cortex /tmp/cron_drop_cache" label="RAM cache clean every hour"/>
+<checkbox description="Enable restarting google services to release memory leak and cpu non stop activity, this is one of the LP RAM leak BUGS. service can stuck, drain RAM and force CPU to work non stop. fix this by restarting the service every 3 hours." name="Google service restart" action="generic_cortex /tmp/cron_ram_release" label="Restart LP google service every 3 hours"/>
+<checkbox description="Cron to update AD-BLOCKER every week at SAT 6:00AM UTC time, from official site. The script will check, if you are connected with the internet, otherwise it will try to use WIFI! Script will turn wifi, wait for connection and update, then when it is finished it will turn WIFI off. If there is no connection, an error will be written in the log." name="Update AD-Block" action="generic_cortex /tmp/ad_block_update" label="Update AD-BLOCKER every week"/>
+<checkbox description="Cron to DB Optimize every day at 3:00 AM, only if CPU is resting (IDLE)!" name="DB Optimization" action="generic_cortex /tmp/cron_db_optimizing" label="DB Optimization task every day at 3:00 AM"/>
+<checkbox description="Cron to clear app-cache every day at 4:00 AM, only if CPU is resting (IDLE)!" name="Clean app-cache" action="generic_cortex /tmp/cron_clear_app_cache" label="Disk Clean task every day at 4:00 AM"/>
+<button description="Use this button to check if Cron Task Jobs are done as requested. This will show the log for all finished jobs." name="Test Cron Task jobs" action="push-actions/crontab_log" label="Test Cron Task Jobs"/>
+</settingsPane>
+</settingsTab>
 <settingsTab name="Apps Random">
 <settingsPane description="Here you can find some settings and options for your apps." name="Apps">
 <button description="Click here to start fixing. Here you can run Fix Permissions, please click one time only, scripts will finish in max 2~3min, no reboot is needed." name="FIX PERMISSIONS" action="push-actions/fix_permissions" label="FIX PERMISSIONS"/>
@@ -417,8 +433,8 @@ name="Mode" action="generic /sys/class/mdnie/mdnie/mode" unit="" min="0" reverse
 </settingsTab>
 <settingsTab name="File system">
 <settingsPane description="These settings control FS options." name="FS Settings">
-<seekBar description="Read-ahead buffer size for sdcard. Optimal value varies with sdcard size and file system used. Default is 128KB." name="Read-ahead buffer" action="generic01 /sys/block/mmcblk0/queue/read_ahead_kb" unit="KB" min="128" reversed="false" step="128" max="4096"/>
-<spinner description="This will set the default I/O scheduler. Default I/O scheduler will only be set during early stages of booting (before init.d execution) and can be overriden by later scripts or apps." name="Default I/O Scheduler" action="generic /sys/block/mmcblk0/queue/scheduler">
+<seekBar description="Read-ahead buffer size for the internal sdcard. Optimal value varies with sdcard size and file system used. Default is 128KB." name="Read-ahead buffer" action="generic01 /sys/block/mmcblk0/queue/read_ahead_kb" unit="KB" min="128" reversed="false" step="128" max="4096"/>
+<spinner description="This will set the default I/O scheduler for the internal sdcard. Default I/O scheduler will only be set during early stages of booting (before init.d execution) and can be overriden by later scripts or apps." name="Default I/O Scheduler" action="generic /sys/block/mmcblk0/queue/scheduler">
 <spinnerItem name="cfq" value="cfq"/>
 <spinnerItem name="deadline" value="deadline"/>
 <spinnerItem name="noop" value="noop"/>
@@ -512,6 +528,9 @@ name="Mode" action="generic /sys/class/mdnie/mdnie/mode" unit="" min="0" reverse
 <checkbox description="Enable or Disable Navigation Bar (needs restart)" name="Navigation Bar" action="navigationbar" label="Navigation Bar"/>
 <checkbox description="Enable or Disable Android Logger (needs reboot)" name="Android Logger" action="generic /tmp/logger" label="Android Logger"/>
 <checkbox description="If checked, BetterBatteryStatus will report discrete (non-overlapping) wakelock statistics." name="Discrete Wakelock Stats" action="generic01 /sys/module/wakelock/parameters/default_stats" label="Discrete Wakelock Stats"/>
+</settingsPane>
+<settingsPane description="INIT.D" name="INIT.D">
+<checkbox description="Enable or disable INIT.D scripts to RUN on boot. If you put scripts in INIT.D, then enable the switch. Default SuperSu script will run on boot by kernel from init.d." name="INIT.D Scripts RUN control" action="generic_cortex /tmp/init_d" label="Enable INIT.D scripts RUN-control"/>
 </settingsPane>
 <settingsPane description="Removing/Reinstalling root to support some apps which requires you not to have a rooted phone." name="Remove/Reinstall Root">
 <button description="Root check. Click to see if you have ROOT or not" name="ROOT Check" action="push-actions/root_check" label="ROOT CHECK"/>

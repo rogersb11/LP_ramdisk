@@ -50,6 +50,24 @@ if [ "$logger" == "on" ];then
 insmod /lib/modules/logger.ko
 fi
 
+# start CROND by tree root, so it's will not be terminated.
+$BB sh /res/crontab_service/service.sh;
+
+CRITICAL_PERM_FIX()
+{
+	# critical Permissions fix
+	$BB chown -R root:root /tmp;
+	$BB chown -R root:root /res;
+	$BB chown -R root:root /sbin;
+	$BB chown -R root:root /lib;
+	$BB chmod -R 777 /tmp/;
+	$BB chmod -R 775 /res/;
+	$BB chmod -R 06755 /sbin/ext/;
+	$BB chmod 06755 /sbin/busybox;
+	$BB chmod 06755 /system/xbin/busybox;
+}
+CRITICAL_PERM_FIX;
+
 # disable debugging on some modules
 if [ "$logger" == "off" ];then
   rm -rf /dev/log
@@ -61,6 +79,13 @@ fi
 if [ "$cifs" == "on" ];then
 insmod /system/lib/modules/cifs.ko
 fi
+
+# copy cron files
+$BB cp -a /res/crontab/ /data/
+if [ ! -e /data/crontab/custom_jobs ]; then
+	$BB touch /data/crontab/custom_jobs;
+	$BB chmod 777 /data/crontab/custom_jobs;
+fi;
 
 # EFS backup
 (
