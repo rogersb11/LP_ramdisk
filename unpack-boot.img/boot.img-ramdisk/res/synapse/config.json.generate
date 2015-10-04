@@ -1,0 +1,23 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+
+{
+    sections: [
+
+		`. /res/synapse/config.json.generate.mycpu`,
+		`. /res/synapse/config.json.generate.mymem`,
+		`. /res/synapse/config.json.generate.myio`,
+		`. /res/synapse/config.json.generate.mynetwork`,
+		`. /res/synapse/config.json.generate.mypower`,
+		`. /res/synapse/config.json.generate.mytouchwake`,
+		`. /res/synapse/config.json.generate.mygestures`,
+		`. /res/synapse/config.json.generate.myled`,
+		`. /res/synapse/config.json.generate.myspen`,
+		`. /res/synapse/config.json.generate.myabb`,
+		`. /res/synapse/config.json.generate.myactions`,
+		`. /res/synapse/config.json.generate.myinformation`,
+    ]
+}
+CTAG
+

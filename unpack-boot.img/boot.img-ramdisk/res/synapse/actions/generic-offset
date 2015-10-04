@@ -1,0 +1,23 @@
+if [ -f $2 ];then
+	FILEVAR=$(basename $2)
+
+	if [ -z $3 ]; then
+		#echo $FILEVAR > /data/file
+		evalcmd='eval echo \$$FILEVAR'
+			read A B C D E F G H < $2
+			offset='eval echo \$$1'
+			offval=`eval $offset`
+
+			eval $FILEVAR=$offval
+	else
+		echo $3 > $2
+
+		read A B C D E F G H < $2
+		offset='eval echo \$$1'
+		offval=`eval $offset`
+
+		eval $FILEVAR=$offval
+	fi
+
+	eval echo \$$FILEVAR
+fi

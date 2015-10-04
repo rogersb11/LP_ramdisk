@@ -1,0 +1,22 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"VirtualKey",
+    elements:[
+	    { SLiveLabel:{
+                  title:"Current ZZMoove Music State",
+                  refresh:1000,
+                  action:"
+                  case \$(cat /sys/devices/system/cpu/cpufreq/zzmoove/music_state) in
+					0) echo Music Is Not Playing;;
+					1) echo Music Is Playing ;;
+	              esac"
+        }},
+		{ SSpacer:{
+		   height:1
+		}},
+    ]
+}
+
+CTAG

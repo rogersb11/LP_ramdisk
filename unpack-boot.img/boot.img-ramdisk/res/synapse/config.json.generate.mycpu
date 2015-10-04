@@ -1,0 +1,178 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:CPU,
+    elements:[
+    	{ SDescription:{
+		description:"\n\tSettings pertaining to the CPU. Including governor, min/max frequencies, PM lock frequency, voltages, MC scheduler mode, and IDLE mode settings.\n\n"
+        }},
+    	{ SPane:{
+		title:"Live Statistics",
+		description:"",
+        }},
+    	{ SLiveLabel:{
+                  title:"CPU & Battery Temperatures",
+                  refresh:1500,
+                  action:"echo CPU: $(( $(cat /sys/devices/platform/s5p-tmu/curr_temp) / 10 ))° C / Battery: $(( $(cat /sys/devices/platform/samsung-battery/power_supply/battery/temp) / 10 ))° C"
+        }},
+        { SSpacer:{
+		   height:1
+		}},
+        { SLiveLabel:{
+                  title:"Current CPU Frequency",
+                  refresh:500,
+                  action:"echo \$(echo \$((\$(cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq) / 1000)) | sed -r ':L s=([0-9]+)([0-9]{3})=\\\\1,\\\\2=') MHz"
+        }},
+        { SSpacer:{
+		   height:1
+		}},
+        { SPane:{
+		title:"Governor",
+		description:""
+        }},
+        { SOptionList:{
+		   title:"CPU Scaling Governor",
+		   description:"\tChoose the CPU scaling governor. Only zzmoove is fully supported, and other governors will break the next two tabs.\n",
+		   default:"ondemand",
+		   unit:"",
+		   action:"generic /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+		   values:[
+		      "ondemand",
+		      "pegasusq",
+		      "performance",
+		      "powersave",
+		      "HYPER",
+		      "zzmoove",
+		      "smartass",
+		      "smartassV2",
+		      "nightmare",
+		      "hotplug",
+		      "lazy",
+		      "wheatley",
+		      "brazilianwax",
+		   ]
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"CPU Governor Maximum Frequency",
+		description:"\tSet the maximum freqency the CPU governor will scale up to.\n",
+		default:1600000,
+		action:"generic /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq",
+		values:{
+`
+			while read FREQ TIME; do
+				LABEL=$(expr $FREQ / 1000)
+				echo "$FREQ:\"${LABEL} MHz\", "
+			done < /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state
+`
+		}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"CPU Governor Minimum Frequency",
+		description:"\tSet the minimum freqency the CPU governor will scale down to.\n",
+		default:200000,
+		action:"generic /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq",
+		values:{
+`
+			while read FREQ TIME; do
+				LABEL=$(expr $FREQ / 1000)
+				echo "$FREQ:\"${LABEL} MHz\", "
+			done < /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state
+`
+		}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"CPU PM Lock Frequency",
+		description:"\tSet the fixed frequency the CPU scales up to while coming out of suspend, before the CPU governor takes over. Affects all governors.\n\n\tWARNING! This varies with each device. If this is set too low (below 500 MHz for most devices) the system will be unable to wake after it goes to sleep, and a battery-pull will be required!\n",
+		default:800000,
+		action:"generic /sys/devices/system/cpu/cpu0/cpufreq/pm_lock_freq",
+		values:{
+`
+			while read FREQ TIME; do
+				LABEL=$(expr $FREQ / 1000)
+				echo "$FREQ:\"${LABEL} MHz\", "
+			done < /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state
+`
+		}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"CPU Voltages",
+		description:"\n\tDecreasing voltage will lower power consumption of the CPU. Increasing it on overclocked frequencies improves stability. Too low voltage may cause instabilities and freezes.\n"
+        }},
+`
+while read FREQ UVOLT; do
+
+	# if [ "$FREQ" == "1600" ]; then
+	# 	echo '{ STitleBar:{ title:"Normal Frequencies" }},'
+	# fi
+
+	# if [ "$FREQ" == "100" ]; then
+	# 	echo '{ STitleBar:{ title:"Underclocked Frequencies" }},'
+	# fi
+
+	echo '{ SSeekBar:{ default:'$UVOLT', '
+
+		echo  'title:"'$FREQ' MHz"'
+
+	echo ', action:"cpuvolt '${FREQ}'", unit:"mV", weight:0.001, min:600000, step:250, '
+
+		echo 'max:1450000 }}, { SDescription:{
+		   description:\"\"
+		}},'
+
+done < /sys/devices/system/cpu/cpu0/cpufreq/UV_uV_table
+`
+
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"Miscellaneous Settings",
+		description:"",
+        }},
+		{ SSeekBar:{
+       		title:"Multi-core Scheduler Mode",
+			description:"\tChange the multi-core scheduler mode.\n",
+			default:2,
+			action:"generic /sys/devices/system/cpu/sched_mc_power_savings",
+			values:{
+				"0":"Disabled",
+				"1":"Mode 1",
+				"2":"Mode 2",
+			}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"IDLE Mode",
+			description:"\tChange the IDLE mode.\n",
+			default:3,
+			action:"generic /sys/module/cpuidle_exynos4/parameters/enable_mask",
+			values:{
+				"0":"Idle only",
+				"1":"AFTR only",
+				"2":"Idle + LPA",
+				"3":"AFTR + LPA",
+			}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+
+    ]
+}
+
+CTAG

@@ -1,0 +1,76 @@
+case $(basename $0) in
+cpuvolt)
+	P=/sys/devices/system/cpu/cpu0/cpufreq/UV_uV_table
+	;;
+gpuvolt)
+	P=/sys/devices/platform/pvrsrvkm.0/sgx_dvfs_volt_table
+	;;
+intvolt)
+	P=/sys/devices/system/cpu/busfreq/int_volt_table
+	;;
+mifvolt)
+	P=/sys/devices/system/cpu/busfreq/mif_volt_table
+	;;
+memiovolt)
+	P=/sys/class/devfreq/exynos5-busfreq-mif/memio_volt_table
+	;;
+esac
+
+readValue() {
+	while read FREQ UVOLT; do
+		if [ $(basename $0) == "intvolt" ]; then
+			S_FREQ=$(echo $FREQ | cut -c 4-)
+			if [ $S_FREQ == $1 ]; then
+				echo $UVOLT
+				return
+			fi
+		elif [ $(basename $0) == "mifvolt" ]; then
+			S_FREQ=$(echo $FREQ | cut -c 1-3)
+			if [ $S_FREQ == $1 ]; then
+				echo $UVOLT
+				return
+			fi
+		else
+			if [ $FREQ == $1 ]; then
+				echo $UVOLT
+				return
+			fi
+		fi
+	done < $P
+}
+
+writeValue() {
+
+	VOLTARR=""
+	while read FREQ UVOLT; do
+		if [ $(basename $0) == "intvolt" ]; then
+			S_FREQ=$(echo $FREQ | cut -c 4-)
+			if [ $S_FREQ == $1 ]; then
+				VOLTARR="$VOLTARR $2"
+			else
+				VOLTARR="$VOLTARR $UVOLT"
+			fi
+		elif [ $(basename $0) == "mifvolt" ]; then
+			S_FREQ=$(echo $FREQ | cut -c 1-3)
+			if [ $S_FREQ == $1 ]; then
+				VOLTARR="$VOLTARR $2"
+			else
+				VOLTARR="$VOLTARR $UVOLT"
+			fi
+		else
+			if [ $FREQ == $1 ]; then
+				VOLTARR="$VOLTARR $2"
+			else
+				VOLTARR="$VOLTARR $UVOLT"
+			fi
+		fi
+	done < $P
+
+	echo $VOLTARR > $P
+}
+
+if [[ ! -z $2 ]]; then
+	writeValue $1 $2
+fi
+
+echo $(readValue $1)

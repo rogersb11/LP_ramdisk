@@ -1,0 +1,195 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"Power",
+    elements:[
+    	{ SDescription:{
+        	description:"\n\tSettings pertaining to charging. Including USB and A/C charging limits, and various other settings.\n\n\tFrom AndreiLux: Device charging currents are composed of input current coming into the device (Nominal 5V) and charge current fed to the battery (Battery Charge Voltage). Charger detection divides charging cable types into three categories: DCP - Dedicated Charging Port and AC Connector plugs; SDP - Standard Downstream Port for typical USB connectors; and CDP - Charging Downstream Port for USB connectors adhering to BC 1.1 specification. Input current is the sum of device load and charging load. If charging current exceeds input load, then charging current is dynamically adjusted. For avoiding battery deterioration, charging currents of less than 0.7 Coloumb are advised (e.g. 2100mAh (capacity) x 0.7 Coloumb = ~1470mA).\n\n",
+        	background:0
+        }},
+        { SPane:{
+		title:"Live Statistics",
+		description:""
+        }},
+		{ SLiveLabel:{
+			title:"Present Charge Source / Type",
+			refresh:1000,
+			action:"charge-source"
+		}},
+		{ SLiveLabel:{
+			title:"Device Input Current",
+			description:"Live current entering the device.",
+			refresh:1000,
+			action:"echo \$(cat /sys/devices/platform/samsung-battery/power_supply/battery/current_max) mA"
+		}},
+		{ SLiveLabel:{
+			title:"Battery Input Current",
+			description:"How much current the battery is actually receiving, and recent average.",
+			refresh:1000,
+			action:"echo \$(cat /sys/devices/platform/samsung-battery/power_supply/battery/current_now) \\\(\$(cat /sys/devices/platform/samsung-battery/power_supply/battery/current_avg)\\\) mA"
+		}},
+
+		{ SDescription:{ 
+			description:""
+		}},
+    	{ SPane:{
+		title:"Charging Currents",
+		description:""
+        }},
+        { SSeekBar:{
+       		title:"Dedicated Charging Port & A/C Input Current",
+			description:"The Dedicated Charging Port (DCP) and A/C input current limit that is applied when detection of a standalone charger occurs, or if a USB connector that has shorted D+ and D- pins is attached.\n",
+			default:`cat /sys/devices/platform/samsung-battery/dcp_ac_input_curr`,
+			max:2000,
+			min:100,
+			step:25,
+			unit:" mA",
+			action:"generic /sys/devices/platform/samsung-battery/dcp_ac_input_curr",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Dedicated Charging Port & A/C Charging Current",
+			description:"The Dedicated Charging Port and A/C charging current that is supplied to the battery while charging.\n",
+			default:`cat /sys/devices/platform/samsung-battery/dcp_ac_chrg_curr`,
+			max:2300,
+			min:100,
+			step:25,
+			unit:" mA",
+			action:"generic /sys/devices/platform/samsung-battery/dcp_ac_chrg_curr",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Standard Downstream Port Input Current",
+			description:"The Standard Downstream Port (SDP) input current limit that is applied on plain and compliant USB data connectivity ports.\n",
+			default:`cat /sys/devices/platform/samsung-battery/sdp_input_curr`,
+			max:1500,
+			min:100,
+			step:25,
+			unit:" mA",
+			action:"generic /sys/devices/platform/samsung-battery/sdp_input_curr",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Standard Downstream Port Charging Current",
+			description:"The Dedicated Charging Port and A/C charging current that is supplied to the battery while charging.\n",
+			default:`cat /sys/devices/platform/samsung-battery/sdp_chrg_curr`,
+			max:1700,
+			min:100,
+			step:25,
+			unit:" mA",
+			action:"generic /sys/devices/platform/samsung-battery/sdp_chrg_curr",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Charging Downstream Port Input Current",
+			description:"The Charging Downstream Port (CDP) input current limit that is applied for BCS 1.1 special charging USB data connectivity ports.\n",
+			default:`cat /sys/devices/platform/samsung-battery/cdp_input_curr`,
+			max:1500,
+			min:100,
+			step:25,
+			unit:" mA",
+			action:"generic /sys/devices/platform/samsung-battery/cdp_input_curr",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Charging Downstream Port Charging Current",
+			description:"The Charging Downstream Port and A/C charging current that is supplied to the battery while charging.\n",
+			default:`cat /sys/devices/platform/samsung-battery/cdp_chrg_curr`,
+			max:1700,
+			min:100,
+			step:25,
+			unit:" mA",
+			action:"generic /sys/devices/platform/samsung-battery/cdp_chrg_curr",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+
+		{ SPane:{
+		title:"Wireless Charging",
+		description:""
+        }},
+        { SSeekBar:{
+       		title:"Wireless Charging Current",
+			description:"The charging current that is supplied to the battery while charging wirelessly.\n",
+			default:`cat /sys/devices/platform/samsung-battery/wpc_chrg_curr`,
+			max:1700,
+			min:100,
+			step:25,
+			unit:" mA",
+			action:"generic /sys/devices/platform/samsung-battery/wpc_chrg_curr",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+
+
+		{ SPane:{
+		title:"Charging Current Adjustments",
+		description:"\n\tThe charger logic makes additional adjustments to the set up currents limits resulting in different live limits being applied. The actual resultant max input limit is decribed in /sys/devices/platform/samsung-battery/power_supply/battery/current_max\n"
+        }},
+        { SCheckBox:{
+			description:"The charger chip is capable of detecting instabilities in the power supplied to the chip, it dynamically adjusts input currents until it reaches a stable power readout - at this point it reduces it further by an additional 100mA step as a safety margin. This ignores that margin.\nDefault: Off",
+			label:"Ignore 100 mA Step Safety Margin",
+			default:0,
+        	action:"generic /sys/devices/platform/samsung-battery/ignore_stable_margin"
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SCheckBox:{
+			description:"This completely disables the unstable power detection.\n\n\tWARNING: USE AT YOUR OWN RISK!\nDefault: Off",
+			label:"Ignore Unstable Power Detection",
+			default:0,
+        	action:"generic /sys/devices/platform/samsung-battery/ignore_unstable_power"
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SPane:{
+		title:"Charging Currents",
+		description:"\n\tCharging voltage control supplied to the battery. A majority of third-party batteries have a 3.7V nominal battery chemistry and are charged at 4.2V as opposed to the stock and advanced 3.8V nominal / 4.35V charging batteries. Full charge is decided by the state-of-charge (Dynamically calibrated in hardware) reported by the fuelgauge and the target charge voltage reached and measured by the fuelgauge.\n\n\tWARNING: USE AT YOUR OWN RISK. OVERCHARGING BATTERIES CAN LEAD TO BATTERY FAILURE, OVERHEATING, AND MELTDOWN.\n"
+        }},
+        { SSeekBar:{
+       		title:"Charge Hard Voltage",
+			description:"Charger chip charge voltage supplied to the battery.\n",
+			default:2,
+			action:"generic /sys/devices/platform/samsung-battery/batt_chrg_hard_volt",
+			values:{
+				"1":"4.20 volts",
+				"2":"4.35 volts",
+				"3":"4.40 volts"
+			}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Charge Soft Voltage",
+			description:"Charge voltage the battery has to reach until the charger regulation turns off charging, as measured by the fuelgauge.\n",
+			default:`cat /sys/devices/platform/samsung-battery/batt_chrg_soft_volt`,
+			max:4500000,
+			min:3600000,
+			step:25000,
+			weight:0.001,
+			unit:" mV",
+			action:"generic /sys/devices/platform/samsung-battery/batt_chrg_soft_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+    ]
+}
+
+CTAG

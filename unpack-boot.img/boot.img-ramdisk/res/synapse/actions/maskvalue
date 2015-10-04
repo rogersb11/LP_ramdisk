@@ -1,0 +1,33 @@
+if [ -f $2 ];then
+	FILEVAR=$(basename $2)_mask_$1
+
+	sysval=`cat $2`
+
+	if [ -z $3 ]; then
+		rawval="eval echo \$(($sysval & $1))"
+		evalcmd='eval echo \$$FILEVAR'
+		if [ "a`eval $evalcmd`" == "a" ]; then
+			if [ "`eval $rawval`" -eq 0 ]; then
+				VAL="off"
+			else
+				VAL="on"
+			fi
+
+			eval $FILEVAR=$VAL
+		fi
+	else
+		case "$3" in
+			on)	rawval="eval echo \$(($sysval | $1))" ;;
+			off)	rawval="eval echo \$(($sysval & ~$1))"	;;
+		esac
+
+		rawval=`eval $rawval`
+
+		echo $rawval > $2
+
+		eval $FILEVAR=$3
+	fi
+
+	eval echo \$$FILEVAR
+fi
+

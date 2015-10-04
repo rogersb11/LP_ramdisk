@@ -1,0 +1,252 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"Haptic / LED",
+    elements:[
+    	{ SDescription:{
+        	description:"\n\tSettings that pertain to notifications. Including LEDs and haptic feedback.\n\n",
+        	background:0
+        }},
+    	{ SPane:{
+		title:"Haptic Settings",
+		description:"\n\tMost ROMs offer the option to customize vibration stength. If yours does not, it can be set here.\n"
+        }},
+        { SSeekBar:{
+       		title:"Vibration Strength",
+			description:"Control the vibration strength. 0 disables it completely systemwide.\n",
+			default:49,
+			max:100,
+			min:0,
+			step:1,
+			unit:"",
+			action:"generic /sys/vibrator/pwm_val",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"LED Brightness",
+		description:"\n\tLED brightness controls do not have a linear scale due to the driver and/or hardware. Dim is 1-5, medium is 5-30, and 30-255 is bright to very bright.\n"
+        }},
+        { SSeekBar:{
+       		title:"User Notifications",
+			description:"Control for LED brightness of user notifications (e.g. missed calls, texts, emails etc).\n",
+			default:40,
+			max:255,
+			min:0,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_highpower_current",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"User Notifications",
+			description:"Control for LED brightness of system notifications (e.g. charging).\n",
+			default:5,
+			max:255,
+			min:0,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_lowpower_current",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"LED Color Addends",
+		description:"\n\tThese controls will globally adjust the LED colors, since not all devices are the same. When the LED pattern is set, each color will first have the below values added (or subtracted) from their respective channel.\n"
+        }},
+        { SSeekBar:{
+       		title:"Red LED Addend",
+			description:"Control for the red LED. Setting this to a positive value will increase red, and a negative value will decrease red.\n",
+			default:0,
+			max:255,
+			min:-255,
+			step:5,
+			unit:"",
+			action:"generic /sys/class/sec/led/addend_red",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Green LED Addend",
+			description:"Control for the green LED. Setting this to a positive value will increase green, and a negative value will decrease green. The green LED is often brighter than the others, and is therefore reduced by default so that the color yellow displays correctly.\n",
+			default:0,
+			max:255,
+			min:-255,
+			step:5,
+			unit:"",
+			action:"generic /sys/class/sec/led/addend_green",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Blue LED Addend",
+			description:"Control for the blue LED. Setting this to a positive value will increase green, and a negative value will decrease green.\n",
+			default:0,
+			max:255,
+			min:-255,
+			step:5,
+			unit:"",
+			action:"generic /sys/class/sec/led/addend_blue",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"LED White Balance",
+		description:"\n\tThese controls allow you to adjust how pure white is displayed by the LEDs, since not all devices are the same. When the LED pattern is set, and a neutral color is called for, each color will first have the below percentages removed from their respective channel.\n"
+        }},
+        { SSeekBar:{
+       		title:"LED White Balance - Red Reduction",
+			description:"Controls white percentage of red will be reduced when displaying a neutral color. It is suggested to not reduce red (leave it at 0%) and only reduce blue and green.\n",
+			default:0,
+			max:100,
+			min:0,
+			step:5,
+			unit:"%",
+			action:"generic /sys/class/sec/led/white_red",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"LED White Balance - Green Reduction",
+			description:"Controls white percentage of red will be reduced when displaying a neutral color.\n",
+			default:65,
+			max:100,
+			min:0,
+			step:5,
+			unit:"%",
+			action:"generic /sys/class/sec/led/white_green",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"LED White Balance - Blue Reduction",
+			description:"Controls white percentage of red will be reduced when displaying a neutral color.\n",
+			default:80,
+			max:100,
+			min:0,
+			step:5,
+			unit:"%",
+			action:"generic /sys/class/sec/led/white_blue",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"LED Blinking Effect",
+		description:"\n\tControl the way the LED blinks. The LED controller has 4 type of slopes in its waveform, 2 rising slopes, and 2 falling slopes. The following configurables can control the blinking waveform. NOTE: The following sliders may not function with all ROMs.\n"
+        }},
+        { SSeekBar:{
+       		title:"Fade-In Time Period",
+			description:"Sets the time period of the two rising slopes (1,2), one time-unit is equal to 0.5 seconds.\n",
+			default:2,
+			max:12,
+			min:0,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_fade_in_time",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Fade-Out Time Period",
+			description:"Sets the time period of the two falling slopes (3,4), one time-unit is equal to 0.5 seconds.\n",
+			default:2,
+			max:100,
+			min:0,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_fade_in_time",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SCheckBox:{
+			description:"If checked, uses the below detention times, otherwise the blinking waveform will have no slopes, i.e. it will be square. Your ROM may have its own fading feature which could interfere with the settings below. If this happens make sure the setting (flash or fade) on your ROM matches the mode here.\nDefault: On",
+			label:"Enable Fading",
+			default:1,
+        	action:"generic /sys/class/misc/mdnie/led_fade"
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Slope 1 Detention Time",
+			description:"The LED is controlled by PWM/pulse wave modulation, the detention time dictates how long the controller spends time on a single step in its slope. One time-unit is equivalent to 4ms.\n",
+			default:1,
+			max:4,
+			min:1,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_fade_dt1",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Slope 2 Detention Time",
+			description:"One time-unit is equivalent to 4ms.\n",
+			default:1,
+			max:4,
+			min:1,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_fade_dt2",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Slope 3 Detention Time",
+			description:"One time-unit is equivalent to 4ms.\n",
+			default:2,
+			max:4,
+			min:1,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_fade_dt3",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Slope 4 Detention Time",
+			description:"One time-unit is equivalent to 4ms.\n",
+			default:3,
+			max:4,
+			min:1,
+			step:1,
+			unit:"",
+			action:"generic /sys/class/sec/led/led_fade_dt4",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SButton:{
+			label:"Test Notification",
+			action:"led 3"
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SButton:{
+			label:"Stop Notification",
+			action:"led 0"
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+    ]
+}
+
+CTAG

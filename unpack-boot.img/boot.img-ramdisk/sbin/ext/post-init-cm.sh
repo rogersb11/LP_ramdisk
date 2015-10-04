@@ -22,7 +22,11 @@ echo 8192 > /proc/sys/vm/admin_reserve_kbytes;
 
 mkdir -p /data/.shift
 chmod 777 /data/.shift
+mkdir -p /data/media/0/shift/backup_synapse
+mkdir -p /data/media/0/shift/screenshots
+chmod 775 /data/media/0/shift -R
 chmod 755 /res/uci.sh
+chmod 755 /res/synapse/actions/*
 
 . /res/customconfig/customconfig-helper
 
@@ -37,14 +41,23 @@ fi
 read_defaults
 read_config
 
-# Cmdline HiJacking
-/sbin/busybox sh /sbin/ext/unmount-cmdline.sh;
+# Fix Synapse database permissions.
+if [ -d /data/data/com.af.synapse ]; then
+	SYNAPSE_OWNER=`ls -ld /data/data/com.af.synapse | awk 'NR==1 {print $3}'`
+	if [ ! -z $SYNAPSE_OWNER ]; then
+		/sbin/busybox chown "$SYNAPSE_OWNER"."$SYNAPSE_OWNER" /data/data/com.af.synapse/databases -R
+	fi;
+	chmod 771 /data/data/com.af.synapse/databases
+	chmod 660 /data/data/com.af.synapse/databases/actionValueStore
+	chmod 600 /data/data/com.af.synapse/databases/actionValueStore-journal
+fi;
+
+/sbin/busybox mount -t rootfs -o remount,rw rootfs
+uci
+/sbin/busybox mount -t rootfs -o remount,ro rootfs
 
 # Apps and ROOT Install
 /sbin/busybox sh /sbin/ext/install.sh;
-
-# Senors and some other stuff
-/sbin/busybox sh /sbin/ext/aosp.sh;
 
 if [ "$logger" == "on" ];then
 insmod /lib/modules/logger.ko

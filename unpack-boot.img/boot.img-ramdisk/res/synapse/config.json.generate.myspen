@@ -1,0 +1,144 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"S-Pen",
+    elements:[
+    	{ SDescription:{
+        	description:"\n\tSettings pertaining to the Wacom stylus (S-Pen) digitizer. Including booster, block, offsets, and various other settings.\n\n",
+        	background:0
+        }},
+    	{ SPane:{
+		title:"S-Pen Booster",
+		description:"\n\tControls for the frequency of the S-Pen Booster. When touching the screen with your S-Pen, this is the frequency the CPU will be locked to.\n"
+        }},
+        { SSeekBar:{
+       		title:"S-Pen Booster Frequency",
+			description:"\tSet the frequency the CPU will be boosted to when pen is writing.\n",
+			default:`cat /sys/devices/virtual/sec/sec_epen/epen_boost_freq`,
+			action:"generic /sys/devices/virtual/sec/sec_epen/epen_boost_freq",
+			values:{
+`
+			while read FREQ TIME; do
+				LABEL=$(expr $FREQ / 1000)
+				echo "$FREQ:\"${LABEL} MHz\", "
+			done < /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state
+`
+		}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"Touchkey Block",
+		description:"\n\tInadvertent presses to the touchkeys while using the stylus can be blocked by setting a delay during which all touchkey input is ignored. This delay starts and stops based on hover state, regardless if the pen is touching the screen or not.\n"
+        }},
+        { SSeekBar:{
+       		title:"Touchkey Block Timeout",
+			description:"\tThe lockout delay during which the touchkeys will remain blocked after the stylus has left the hover state. 0 disables the setting.\n",
+			default:1500,
+			max:15000,
+			min:0,
+			step:500,
+			unit:" milliseconds",
+			action:"generic /sys/devices/virtual/sec/sec_epen/epen_touchkey_block_length",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"Input Smoothing",
+		description:""
+        }},
+        { SSeekBar:{
+       		title:"Averaging Strength",
+			description:"\tAveraging strength filters out the natively imprecise input from the digitizer hardware itself. Disabled and Level 1 are just for amusement.\n",
+			default:2,
+			action:"generic /sys/devices/virtual/sec/sec_epen/epen_avg_strength",
+			values:{
+				"0":"Disabled",
+				"1":"Level 1",
+				"2":"Level 2",
+				"3":"Level 3"
+			}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Box Filter Threshold",
+			description:"\tControl for the strength of the box filter. Makes drawing easier, but writing harder. 0 disables the setting.\n",
+			default:0,
+			max:500,
+			min:0,
+			step:5,
+			unit:"",
+			listBound:false,
+			action:"generic /sys/devices/virtual/sec/sec_epen/epen_boxfilter_threshold",
+			values:{
+				"0":"Disabled"
+			}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Box Filter Threshold - Hovering",
+			description:"\tControl for the strength of the box filter while hovering. 0 disables the setting.\n",
+			default:0,
+			max:500,
+			min:0,
+			step:5,
+			unit:"",
+			listBound:false,
+			action:"generic /sys/devices/virtual/sec/sec_epen/epen_boxfilter_threshold_hover",
+			values:{
+				"0":"Disabled"
+			}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"Offset",
+		description:""
+        }},
+		{ SCheckBox:{
+			description:"\tChecking this will use the X/Y offsets defined below, otherwise Samsung default values will be applied.\nDefault: Off",
+			label:"Use Offset Override",
+			default:0,
+        	action:"generic /sys/devices/virtual/sec/sec_epen/epen_offset_override_enable"
+		}},
+		{ SSpacer:{
+		   height:2
+		}},
+		{ SSeekBar:{
+       		title:"X-Axis Offset",
+			description:"\tThe amount the X-axis input coordinates will be offset by. The units below do NOT equate to pixels, roughly 10 units equal 1 pixel.\n",
+			default:0,
+			max:100,
+			min:-100,
+			step:1,
+			unit:"",
+			action:"generic /sys/devices/virtual/sec/sec_epen/epen_offset_override_x",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Y-Axis Offset",
+			description:"\tThe amount the Y-axis input coordinates will be offset by. The units below do NOT equate to pixels, roughly 10 units equal 1 pixel.\n",
+			default:0,
+			max:100,
+			min:-100,
+			step:1,
+			unit:"",
+			action:"generic /sys/devices/virtual/sec/sec_epen/epen_offset_override_y",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+    ]
+}
+
+CTAG

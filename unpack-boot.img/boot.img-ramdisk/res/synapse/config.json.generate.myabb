@@ -1,0 +1,228 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"ABB",
+    elements:[
+    	{ SDescription:{
+        	description:"\n\tAdaptive Body Bias (ABB) is a secondary voltage applied to the body of the transistor, whereas traditional voltage tweaks only affect the gate voltage of the transistor. Adjusting the body voltage in a differential to the gate voltage changes the characteristics of how the transistor switches. The body bias is the delta of the body voltage to the gate voltage, or put another way, the gate voltage minus the body voltage. To reiterate, the simple formula to calculate your body bias is: (bodybias = gatevoltage - bodyvoltage). A shift towards positive body bias results in a Forward Body Bias (FBB) that lowers the switching threshold of the transistor, essentially making it easier to switch but less efficient because of power leakage. The benefit to this is that less gate voltage is needed, giving you better chances at stably undervolting/overclocking. In most cases the extra power leakage is trivial compared to the powersaving benefits of even a small reduction in gate voltage. A shift towards negative body bias results in a Reverse Body Bias (RBB) which raises the switching threshold and can drastically reduce power lost via leakage, but at the cost of reducing your chances of stably undervolting/overclocking. WARNING: For advanced users only who understand the electrical physics behind it.\n\n",
+        	background:0
+        }},
+    	{ SPane:{
+		title:"CPU",
+		description:"\n\tARM (CPU) body voltages.\n"
+        }},
+        { SSeekBar:{
+       		title:"Slice 1 Frequency Step",
+			description:"Affects all frequencies equal to or below this frequency.\n",
+			default:`cat /sys/devices/system/abb/arm/arm_slice_1_freq`,
+			action:"generic /sys/devices/system/abb/arm/arm_slice_1_freq",
+			values:{
+`
+			while read FREQ TIME; do
+				LABEL=$(expr $FREQ / 1000)
+				echo "$FREQ:\"${LABEL} MHz\", "
+			done < /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state
+`
+		}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"Slice 1 Voltage",
+			description:"",
+			default:`cat /sys/devices/system/abb/arm/arm_slice_1_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/arm/arm_slice_1_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Slice 2 Frequency Step",
+			description:"Affects all frequencies equal to or below this frequency.\n",
+			default:`cat /sys/devices/system/abb/arm/arm_slice_2_freq`,
+			action:"generic /sys/devices/system/abb/arm/arm_slice_2_freq",
+			values:{
+`
+			while read FREQ TIME; do
+				LABEL=$(expr $FREQ / 1000)
+				echo "$FREQ:\"${LABEL} MHz\", "
+			done < /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state
+`
+		}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"Slice 2 Voltage",
+			description:"",
+			default:`cat /sys/devices/system/abb/arm/arm_slice_2_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/arm/arm_slice_2_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Slice 3 Frequency Step",
+			description:"Affects all frequencies equal to or below this frequency.\n",
+			default:`cat /sys/devices/system/abb/arm/arm_slice_3_freq`,
+			action:"generic /sys/devices/system/abb/arm/arm_slice_3_freq",
+			values:{
+`
+			while read FREQ TIME; do
+				LABEL=$(expr $FREQ / 1000)
+				echo "$FREQ:\"${LABEL} MHz\", "
+			done < /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state
+`
+		}
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"Slice 3 Voltage",
+			description:"",
+			default:`cat /sys/devices/system/abb/arm/arm_slice_3_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/arm/arm_slice_3_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"Slice 4 Voltage",
+			description:"",
+			default:`cat /sys/devices/system/abb/arm/arm_slice_4_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/arm/arm_slice_4_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"GPU",
+		description:"\n\G3D (GPU) body voltages.\n"
+        }},
+        { SSeekBar:{
+       		title:"Slice 1 GPU Voltage",
+			description:"Affects all GPU frequencies that are equal to or below `cat /sys/devices/system/abb/g3d/g3d_slice_1_freq` Hz.\n",
+			default:`cat /sys/devices/system/abb/g3d/g3d_slice_1_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/g3d/g3d_slice_1_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"Slice 2 GPU Voltage",
+			description:"Affects all frequencies higher than `cat /sys/devices/system/abb/g3d/g3d_slice_1_freq` MHz but equal to or below `cat /sys/devices/system/abb/g3d/g3d_slice_2_freq` Hz.\n",
+			default:`cat /sys/devices/system/abb/g3d/g3d_slice_2_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/g3d/g3d_slice_2_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Slice 3 GPU Voltage",
+			description:"Affects all frequencies above `cat /sys/devices/system/abb/g3d/g3d_slice_2_freq` Hz.\n",
+			default:`cat /sys/devices/system/abb/g3d/g3d_slice_3_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/g3d/g3d_slice_3_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+
+
+		{ SPane:{
+		title:"MIF",
+		description:"\nMIF (Memory Interface) body voltages.\n"
+        }},
+        { SSeekBar:{
+       		title:"Slice 1 MIF Voltage",
+			description:"Affects all frequencies that are equal to or below `cat /sys/devices/system/abb/mif/mif_slice_1_freq` Hz.\n",
+			default:`cat /sys/devices/system/abb/mif/mif_slice_1_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/mif/mif_slice_1_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"Slice 2 MIF Voltage",
+			description:"hAffects all frequencies above `cat /sys/devices/system/abb/mif/mif_slice_1_freq` Hz.\n",
+			default:`cat /sys/devices/system/abb/mif/mif_slice_2_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/mif/mif_slice_2_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+
+		{ SPane:{
+		title:"MIF",
+		description:"\nINT (Internal SoC) body voltages.\n"
+        }},
+        { SSeekBar:{
+       		title:"Slice 1 INT Voltage",
+			description:"Affects all frequencies that are equal to or below `cat /sys/devices/system/abb/int/int_slice_1_freq` Hz.\n",
+			default:`cat /sys/devices/system/abb/int/int_slice_1_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/int/int_slice_1_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"Slice 2 INT Voltage",
+			description:"hAffects all frequencies above `cat /sys/devices/system/abb/int/int_slice_1_freq` Hz.\n",
+			default:`cat /sys/devices/system/abb/int/int_slice_1_volt`,
+			max:1600,
+			min:600,
+			step:50,
+			unit:" mV",
+			action:"generic /sys/devices/system/abb/int/int_slice_2_volt",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+
+    ]
+}
+
+CTAG

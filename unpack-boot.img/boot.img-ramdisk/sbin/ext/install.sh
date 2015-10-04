@@ -29,6 +29,10 @@ cd /;
 #}
 #extract_payload; #disabled
 
+# Setup Synapse UCI support
+cp -a /res/synapse/uci /system/xbin/uci;
+chmod 777 /system/xbin/uci;
+
 # copy cron files
 cp -a /res/crontab/ /data/
 rm -rf /data/crontab/cron/ > /dev/null 2>&1;

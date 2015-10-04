@@ -1,0 +1,31 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"Network",
+    elements:[
+    	{ SDescription:{
+		description:"\n\tSome network stuff here.\n"
+        }},
+        { SOptionList:{
+		   title:"TCP Congestion Algorithm",
+		   description:"Set the TCP congestion algorithm. Cubic is the CyanogenMod default, but most prefer Westwood or Veno.\n",
+		   default:"westwood",
+		   unit:"",
+		   action:"generic /proc/sys/net/ipv4/tcp_congestion_control",
+		   values:[
+		   	"bic",
+		   	"cubic",
+		   	"htcp",
+		   	"hybla",
+		   	"veno",
+		   	"westwood"
+		   ]
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+    ]
+}
+
+CTAG

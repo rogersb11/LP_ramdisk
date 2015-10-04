@@ -1,0 +1,43 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"Touchwake / Slide2Wake",
+    elements:[
+    	{ SDescription:{
+		description:"\n\tSettings pertaining to Touchwake, Slide2Wake, and Arc2Wake.\n\n\tTouchwake gives your device a grace period after the screen times out, during which a touch (or only a swipe if so desired) will wake it. Optionally, persistent mode can extend this functionality by holding a wakelock - making it so your screen will always wake from a touch/swipe even when turned off normally (not timed out).\n"
+        }},
+        { SCheckBox:{
+			label:"Enable Touchwake/Slide2Wake",
+			description:"\tEnables the Touchwake and Slide2Wake engine.\n\n\tNote: Some ROMs autodetect the existence of Touchwake, and then offer to control this setting via the normal Settings menu.\nDefault: Off\n",
+			default:0,
+	        action:"generic /sys/devices/virtual/misc/touchwake/enabled"
+		}},
+        { SPane:{
+		title:"Touchwake General Settings",
+		description:"",
+        }},
+		{ SSeekBar:{
+       		title:"Grace Period After Screen Times Out",
+			description:"\tSet the grace period in seconds that Touchwake will remain active after the screen times out.\n\n\tNote: This setting is ignored when persistent mode is enabled, unless tap-wake-override is enabled too.\n\n\tNote: Some ROMs autodetect the existence of Touchwake, and then offer to control this setting via the normal Settings menu.\n",
+			default:10000,
+			max:60000,
+			min:0,
+			step:1000,
+			weight:0.001,
+			unit:" seconds",
+			action:"generic /sys/devices/virtual/misc/touchwake/delay",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SCheckBox:{
+			label:"Wake from swipe only (Needed for Slide2Wake!)",
+			description:"\tBy default Touchwake wakes from any tap on the screen while active, and so does Slide2Wake unless this setting is enabled. If this setting is not enabled, and S2W is enabled above, S2W is effectively Tap2Wake, and will turn your device on every time the screen is touched. If you're at a desk, this might be desirable. Otherwise if you're using S2W you'll want to only wake from a swipe, so enable this.\nDefault: Off (set to On if you want to use Slide2Wake!)\n\n\tNote: If this is enabled without S2W, it will change Touchwake to only wake from a swipe, instead of a tap (as would be the default). But what if you want both? What if you want to use S2W, but if the screen times out, you want to wake with just a tap for the normal grace period? Then use the setting below to force Touchwake to always wake from a tap, regardless of what is set here.\n",
+			default:0,
+	        action:"generic /sys/devices/virtual/misc/touchwake/s2w"
+		}},
+    ]
+}
+
+CTAG

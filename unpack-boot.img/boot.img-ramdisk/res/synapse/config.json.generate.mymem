@@ -1,0 +1,182 @@
+#!/sbin/busybox sh
+
+cat << CTAG
+{
+    name:"Memory",
+    elements:[
+    	{ SDescription:{
+        	description:"\n\tSettings pertaining to the memory and internal buses. Including sampling rate, thresholds, voltages, and various other settings.\n\n\tMIF/INT represent the SoCs memory interface and internal components. The DVFS logic controls both frequencies in pairwise steps, although the frequencies are independent, they are defined together in pairwise steps. MIF or Memory Interface is the direct voltage and frequency used on the C2C bus to the memory chip. INT or internal voltage and frequency are the internal bus and all components connected to it other than the CPU and GPU cores. This encompasses blocks like the camera interfaces, the ISP, the I/O controllers and the MFC (Hardware decoder). The configurables below control the scaling parameters of the DVFS logic of this block. The next target frequency is decided by the maximum of (Target DMC frequency ; Target CPU frequency ; Busfreq lock frequency).\n\n",
+        	background:0
+        }},
+    	{ SPane:{
+		title:"Live Statistics",
+		description:""
+        }},
+        { SLiveLabel:{
+                  title:"Current Memory / Internal Frequencies",
+                  refresh:1000,
+                  action:"echo \$(cat /sys/devices/system/cpu/busfreq/curr_freq_only | cut -c1-3) MHz / \$(cat /sys/devices/system/cpu/busfreq/curr_freq_only | cut -c4-6) MHz"
+        }},
+        { SSpacer:{
+		   height:1
+		}},
+        { SPane:{
+		title:"Sampling",
+		description:""
+        }},
+        { SSeekBar:{
+       		title:"Bus Sampling Rate",
+			description:"This is how frequently the GPU governor will check to see if it needs to adjust the GPU step.\n",
+			default:`cat /sys/devices/system/cpu/busfreq/sampling_rate`,
+			max:500000,
+			min:10000,
+			step:5000,
+			weight:0.001,
+			unit:" milliseconds",
+			action:"generic /sys/devices/system/cpu/busfreq/sampling_rate",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"Bus Governor Settings",
+		description:""
+        }},
+		{ SSeekBar:{
+       		title:"Load History Size",
+			description:"The Platform Performance Monitoring Unit (PPMU) collects usage information on the bus on a hardware level from the CPU and the two memory controllers (DMCs). This dictates the size of the history the kernel keeps in store.\n",
+			default:`cat /sys/devices/system/cpu/busfreq/load_history_size`,
+			max:5,
+			min:1,
+			step:1,
+			unit:" samples",
+			action:"generic /sys/devices/system/cpu/busfreq/load_history_size",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+        { SSeekBar:{
+       		title:"DMC Maximum Threshold",
+			description:"The DMC maximum threshold above which the average load of the memory controllers over the last sample is exceeded, the maximum OPP step is set.\n",
+			default:`cat /sys/devices/system/cpu/busfreq/dmc_max_threshold`,
+			max:99,
+			min:1,
+			step:1,
+			unit:"%",
+			action:"generic /sys/devices/system/cpu/busfreq/dmc_max_threshold",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Idle Threshold",
+			description:"The idle threshold, which, if the memory controller load falls below it, reduces the OPP step by one step. If the live load falls between the idle threshold and DMC max threshold, the average DMC load over the load history size is taken and normalized towards the maximum OPP frequency, and this ondemand-like target frequency dictates the next DMC frequency.\n",
+			default:`cat /sys/devices/system/cpu/busfreq/idle_threshold`,
+			max:50,
+			min:1,
+			step:1,
+			unit:"%",
+			action:"generic /sys/devices/system/cpu/busfreq/idle_threshold",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Maximum CPU Bus Threshold",
+			description:"The CPU maximum bus threshold above which the load of the CPU bus over the last sample is exceeded, the maximum OPP step is set.\n",
+			default:`cat /sys/devices/system/cpu/busfreq/max_cpu_threshold`,
+			max:99,
+			min:1,
+			step:1,
+			unit:"%",
+			action:"generic /sys/devices/system/cpu/busfreq/max_cpu_threshold",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"Up CPU threshold",
+			description:"The CPU bus up threshold, actually acting as a delimiter threshold of sorts, if the load exceeds up_threshold but doesn't exceed max CPU threshold, it takes into account the CPU load slope size to step down one step, if the slope conditional isn't met, the CPU target bus frequency stays the same.\n",
+			default:`cat /sys/devices/system/cpu/busfreq/up_cpu_threshold`,
+			max:99,
+			min:1,
+			step:1,
+			unit:"%",
+			action:"generic /sys/devices/system/cpu/busfreq/up_cpu_threshold",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SSeekBar:{
+       		title:"CPU Slope Size",
+			description:"The DMC maximum threshold above which the average load of the memory controllers over the last sample is exceeded, the maximum OPP step is set.\n",
+			default:`cat /sys/devices/system/cpu/busfreq/cpu_slope_size`,
+			max:50,
+			min:1,
+			step:1,
+			unit:"%",
+			action:"generic /sys/devices/system/cpu/busfreq/cpu_slope_size",
+		}},
+		{ SSpacer:{
+		   height:1
+		}},
+		{ SPane:{
+		title:"Internal Voltages",
+		description:""
+        }},
+`
+LAST_FREQ=0
+while read FREQ VOLT; do
+  	S_FREQ=$(echo $FREQ | cut -c 4-)
+  	if [ $S_FREQ != $LAST_FREQ ]; then
+	  	evalcmd=$(echo $INT_$S_FREQ)
+		eval "INT_$S_FREQ=$VOLT"
+	    echo "{ SSeekBar:{
+       		title:\\"Internal Voltage @ ${S_FREQ} MHz\\",
+			default:$VOLT,
+			max:1150000,
+			min:600000,
+			step:12500,
+			weight:0.001,
+			unit:\\" mV\\",
+			action:\\"intvolt ${S_FREQ}\\",
+		}},
+		{ SDescription:{
+		   description:\\"\\"
+		}},"
+		LAST_FREQ=$S_FREQ
+	fi
+done < /sys/devices/system/cpu/busfreq/int_volt_table
+`
+		{ SPane:{
+		title:"Internal Voltages",
+		description:""
+        }},
+`
+LAST_FREQ=0
+while read FREQ VOLT; do
+  	S_FREQ=$(echo $FREQ | cut -c 1-3)
+  	if [ $S_FREQ != $LAST_FREQ ]; then
+	  	evalcmd=$(echo $INT_$S_FREQ)
+		eval "INT_$S_FREQ=$VOLT"
+	    echo "{ SSeekBar:{
+       		title:\\"Memory Voltage @ ${S_FREQ} MHz\\",
+			default:$VOLT,
+			max:1100000,
+			min:750000,
+			step:50000,
+			weight:0.001,
+			unit:\\" mV\\",
+			action:\\"mifvolt ${S_FREQ}\\",
+		}},
+		{ SDescription:{
+		   description:\\"\\"
+		}},"
+		LAST_FREQ=$S_FREQ
+	fi
+done < /sys/devices/system/cpu/busfreq/mif_volt_table
+`
+    ]
+}
+
+CTAG
