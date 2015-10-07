@@ -55,7 +55,7 @@ cat << CTAG
 		{ SSeekBar:{
        		title:"Gesture Booster Frequency",
 			description:"\tSet the frequency the CPU will be boosted to when a gesture is detected.\n",
-			default:`cat /sys/devices/virtual/misc/touch_gestures/gesturebooster_freq`,
+			default:`800000`,
 			action:"generic /sys/devices/virtual/misc/touch_gestures/gesturebooster_freq",
 			values:{
 `

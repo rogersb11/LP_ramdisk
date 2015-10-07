@@ -33,14 +33,6 @@ cd /;
 cp -a /res/synapse/uci /system/xbin/uci;
 chmod 777 /system/xbin/uci;
 
-# copy cron files
-cp -a /res/crontab/ /data/
-rm -rf /data/crontab/cron/ > /dev/null 2>&1;
-if [ ! -e /data/crontab/custom_jobs ]; then
-touch /data/crontab/custom_jobs;
-chmod 777 /data/crontab/custom_jobs;
-fi;
-
 # add gesture_set.sh with default gustures to data to be used by user.
 if [ ! -e /data/gesture_set.sh ]; then
 	$BB cp -a /res/misc/gesture_set.sh /data/;
